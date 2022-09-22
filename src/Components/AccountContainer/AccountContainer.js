@@ -9,7 +9,30 @@ import Navbar from 'react-bootstrap/Navbar';
 import Form from 'react-bootstrap/Form';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import ProfileButton from "../ProfileButton/ProfileButton"
+import { Link } from "react-router-dom";
+import Button from 'react-bootstrap/Button';
 
+const createNewAccount=()=>{
+
+}
+
+const getCompanies = async ()=>{ 
+    const collectionRef=collection(db,'companies')
+    const querySnapshot = await getDocs(collectionRef)
+    const data =querySnapshot.docs.map(doc=>{
+        return({id: doc.id ,...doc.data()})
+    })
+    return(data)
+     }
+
+const getCustomers = async ()=>{ 
+    const collectionRef=collection(db,'clientes')
+    const querySnapshot = await getDocs(collectionRef)
+    const data =querySnapshot.docs.map(doc=>{
+        return({id: doc.id ,...doc.data()})
+    })
+    return(data)
+     }
 
 
 //obtengo los documentos de la coleccion facturas
@@ -25,6 +48,8 @@ const getAccounts = async ()=>{
 
 //llamo a la funcion para traer los documentos de la coleccioon facturas y muestro si esta vencida una factura o no 
 export const ShowAccounts = ()=>{
+    const [companies,setCompanies]=useState([])
+    const [customers, setCustomers]=useState([])
     const [resetAccount,setResetAccount]=useState([])
     const [customerFilter,setCustomerFilter]=useState("")
     const [companyFilter,setCompanyFilter]=useState("")
@@ -102,9 +127,10 @@ export const ShowAccounts = ()=>{
                 lastTR.classList.add("hide");
 
             }  
+        }
+        
  
         // mostrar las cuentas corrientes y cambiar si esta vencido o no  
-        }
         const [accounts,setAccounts]=useState([])
         const [loading,setLoading]=useState(true)
         useEffect(()=>{
@@ -130,6 +156,27 @@ export const ShowAccounts = ()=>{
                 setLoading(false)
             })
         },[])
+
+        useEffect(()=>{
+            getCustomers().then(response=>{
+                setCustomers(response)    
+            }).catch(error=>{
+                console.log(error)
+            }).finally(()=>{
+                setLoading(false)
+            })
+        },[])
+
+        useEffect(()=>{
+            getCompanies().then(response=>{
+                setCompanies(response)    
+            }).catch(error=>{
+                console.log(error)
+            }).finally(()=>{
+                setLoading(false)
+            })
+        },[])
+       
        
         
 
@@ -143,22 +190,18 @@ export const ShowAccounts = ()=>{
                     <ProfileButton/>  
                     <Nav className="me-auto">
                     <NavDropdown title="Menu" className='select' id="nav-dropdown">
-                        <NavDropdown.Item eventKey="4.1">Facturas</NavDropdown.Item>
+                        <NavDropdown.Item eventKey="4.1" as={Link} to={'/'}>Facturas</NavDropdown.Item>
                         <NavDropdown.Item eventKey="4.2">Recibos</NavDropdown.Item>                            
-                        <NavDropdown.Item eventKey="4.3">Clientes</NavDropdown.Item>
-                        <NavDropdown.Item eventKey="4.4">Empresas</NavDropdown.Item>
+                        <NavDropdown.Item eventKey="4.3" as={Link} to={'/clientes'} >Clientes</NavDropdown.Item>
+                        <NavDropdown.Item eventKey="4.4" as={Link} to={'/empresas'}>Empresas</NavDropdown.Item>
                     </NavDropdown>
                     <Form.Select onChange={HandleChange} id='cliente' className='select'  aria-label="Default select example">
                         <option value="">Cliente</option>
-                        <option value="Hakim">Hakim</option>
-                        <option value="Lopez">Lopez</option>
-                        <option value="3">Three</option>
+                        {customers.map(customer=><option value={customer.name}>{customer.name}</option>)}
                     </Form.Select>
                     <Form.Select onChange={HandleChange} id='empresa' className='select'  aria-label="Default select example">
-                        <option value="">Empresa</option>
-                        <option value="Cremigal">Cremigal</option>
-                        <option value="Sobrero y Cagnolo">Sobrero y Cagnolo</option>
-                        <option value="3">Three</option>
+                    <option value="">Empresa</option>
+                        {companies.map(company=><option value={company.name}>{company.name}</option>)}
                     </Form.Select>
                     <Form.Select onChange={HandleChange} id='tipo' className='select' aria-label="Default select example">
                         <option value="">Tipo</option>
@@ -174,6 +217,7 @@ export const ShowAccounts = ()=>{
                         aria-label="Search"
                         />
                     </Form>
+                    <Button variant='primary'> Nueva Factura</Button>
                     </Container>
                 </Navbar>
                 <Table id="datos" variant="dark">
