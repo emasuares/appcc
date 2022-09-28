@@ -12,9 +12,7 @@ import ProfileButton from "../ProfileButton/ProfileButton"
 import { Link } from "react-router-dom";
 import Button from 'react-bootstrap/Button';
 
-const createNewAccount=()=>{
 
-}
 
 const getCompanies = async ()=>{ 
     const collectionRef=collection(db,'companies')
@@ -197,11 +195,11 @@ export const ShowAccounts = ()=>{
                     </NavDropdown>
                     <Form.Select onChange={HandleChange} id='cliente' className='select'  aria-label="Default select example">
                         <option value="">Cliente</option>
-                        {customers.map(customer=><option value={customer.name}>{customer.name}</option>)}
+                        {customers.map(customer=><option key={customer.id} value={customer.name}>{customer.name}</option>)}
                     </Form.Select>
                     <Form.Select onChange={HandleChange} id='empresa' className='select'  aria-label="Default select example">
                     <option value="">Empresa</option>
-                        {companies.map(company=><option value={company.name}>{company.name}</option>)}
+                        {companies.map(company=><option key={company.id} value={company.name}>{company.name}</option>)}
                     </Form.Select>
                     <Form.Select onChange={HandleChange} id='tipo' className='select' aria-label="Default select example">
                         <option value="">Tipo</option>
@@ -217,7 +215,8 @@ export const ShowAccounts = ()=>{
                         aria-label="Search"
                         />
                     </Form>
-                    <Button variant='primary'> Nueva Factura</Button>
+                    <Button variant='primary' as={Link} to={'/Nueva-Factura'} > Nueva Factura</Button>
+                    <Button variant='danger' as={Link} to={'/Eliminar-Factura'} > Eliminar Factura</Button>
                     </Container>
                 </Navbar>
                 <Table id="datos" variant="dark">
