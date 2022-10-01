@@ -1,18 +1,45 @@
 import { db } from "../../Services";
 import { DateTime } from "luxon";
-import {getDocs,collection,} from 'firebase/firestore'
+import {getDocs,collection,doc,deleteDoc} from 'firebase/firestore'
 import { useEffect,useState } from "react";
 import Table from 'react-bootstrap/Table';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
+import { useNavigate } from "react-router-dom";
+
+
 
 
 export const RemoveAccounts=()=>{
     const [accounts,setAccounts]=useState([])
     const [loading,setLoading]=useState(true)
+    let toDelete=[]
+    const navigate=useNavigate()
 
-    const handleSubmit=()=>{
+    const handleChange=(e)=>{
+        const state=e.target.checked
+        const value=e.target.value
+        if (state===true){
+            toDelete=[...toDelete,value]
+            console.log(toDelete)
+        }else{    
+            var myIndex = toDelete.indexOf(e.target.value)
+                toDelete.splice(myIndex, 1)
+                console.log(toDelete)
+        }
+    }
 
+    const deleteFromFirestore=async(id)=>{
+        await deleteDoc(doc(db, "facturas",`${id}`)).then(()=>{
+            console.log("Se borraron los documentos")
+        }).catch((error)=>{
+        console.log(error)
+        }).finally(navigate('/'))
+    }
+
+    const handleSubmit=(e)=>{
+        e.preventDefault()
+        toDelete.forEach(element=>deleteFromFirestore(element))
     }
 
     const getAccounts = async ()=>{ 
@@ -66,7 +93,7 @@ export const RemoveAccounts=()=>{
                         </thead>
                         <tbody>
                         {accounts.map(account=>
-                            <tr key={account.id} >
+                            <tr key={account.id}  >
                                 <td>{account.cliente}</td>
                                 <td>{account.empresa}</td>
                                 <td>{account.tipo}</td>
@@ -77,6 +104,7 @@ export const RemoveAccounts=()=>{
                                 <td><Form onSubmit={handleSubmit}>
                                         <div key={account.id} className="mb-3">
                                         <Form.Check 
+                                            onChange={handleChange}
                                             type="switch"
                                             label="Eliminar"
                                             value={account.id}
@@ -88,7 +116,7 @@ export const RemoveAccounts=()=>{
                             </tr>)}
                         </tbody>
                     </Table>
-                    <Button variant="primary" type="submit">Eliminar Facturas</Button>
+                    <Button variant="primary" onClick={handleSubmit} type="submit">Eliminar Facturas</Button>
                     </div>
     )
                         }

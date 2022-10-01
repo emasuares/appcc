@@ -134,6 +134,16 @@ export const ShowAccounts = ()=>{
         useEffect(()=>{
             getAccounts().then(response=>{
                 const toUpdate=response
+                toUpdate.sort((a, b)=> {
+                    if (a.fecha > b.fecha) {
+                      return 1;
+                    }
+                    if (a.fecha < b.fecha) {
+                      return -1;
+                    }
+                    // a must be equal to b
+                    return 0;
+                  })
                 toUpdate.forEach(doc=>{
                     const today =new Date().toISOString()
                     const fechadoc=doc.fecha.toDate().toISOString()
