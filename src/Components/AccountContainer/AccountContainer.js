@@ -49,46 +49,108 @@ export const ShowAccounts = ()=>{
     const [companies,setCompanies]=useState([])
     const [customers, setCustomers]=useState([])
     const [resetAccount,setResetAccount]=useState([])
-    const [customerFilter,setCustomerFilter]=useState("")
-    const [companyFilter,setCompanyFilter]=useState("")
-    const [typeFilter,setTypeFilter]=useState("")
-    let filter1=""
-    let filter2=""
-    let filter3=""
+    const [accounts,setAccounts]=useState([])
+    const [loading,setLoading]=useState(true)
+    const [filters,setFilters]=useState({cliente:"",empresa:"",tipo:""})
+    const [total,setTotal]=useState(0)
+ 
     
     
-    const HandleChange=(e)=>{
-        let tofilter=resetAccount    
-         switch(e.target.id){
-            case "cliente": filter1=e.target.value
-            setCustomerFilter(filter1)
-            break;
-            case "empresa": filter2=e.target.value
-            setCompanyFilter(filter2)
-            break;
-            case "tipo": filter3=e.target.value
-            setTypeFilter(filter3)
-            break;
-            default:console.log("ocurrio un problema")
-        } 
-            if (filter1!=="" || filter2!=="" || filter3!==""){
-                const  filteredAccounts=tofilter.filter(account=>(
-                    account.cliente.includes(customerFilter) &&
-                    account.empresa.includes(companyFilter) &&
-                    account.tipo.includes(typeFilter)
-                ))
-                console.log(filter1,filter2,filter3)
-                setAccounts(filteredAccounts)
-            }
-            else if(filter1==="" && filter2==="" && filter3==="") {
-                setAccounts(resetAccount)  
-            }   
+           
+        const HandleChange=(e)=> { 
+            const { target } = e;
+           const { name, value } = target; 
+            const newValues = {
+             ...filters,
+             [name]: value,
+           }; 
+           setFilters({...newValues});
+           console.log(filters)
+         }
+    
+
+    const handleSubmit =(e)=>{
+        e.preventDefault()
+        if(filters.cliente!=="" && filters.empresa!=="" && filters.tipo!==""){
+            //buscar por los tres filtros
+            console.log("se busco por los tres filtros")
+            const filteredAccounts = accounts.filter(account=>{
+                if (account.cliente.includes(filters.cliente) && account.empresa.includes(filters.empresa) && account.tipo.includes(filters.tipo)){
+                    return true
+                }  
+                else return false
+            })
+            setAccounts(filteredAccounts)
+        }else if (filters.cliente!=="" && filters.empresa==="" && filters.tipo===""){
+            //buscar por cliente
+            console.log("se busco por cliente")
+            const filteredAccounts = accounts.filter(account=>{
+                if (account.cliente.includes(filters.cliente)){
+                    return true
+                } 
+                else return false 
+            })
+            setAccounts(filteredAccounts)
+        }else if (filters.cliente==="" && filters.empresa!=="" && filters.tipo===""){
+            //busca por empresa
+            console.log("se busco por empresa")
+            const filteredAccounts = accounts.filter(account=>{
+                if (account.empresa.includes(filters.empresa)){
+                    return true
+                }  
+                else return false
+            })
+            setAccounts(filteredAccounts)
+        }else if (filters.cliente==="" && filters.empresa==="" && filters.tipo!==""){
+            //busca por tipo
+            console.log("se busco por tipo")
+            const filteredAccounts = accounts.filter(account=>{
+                if (account.tipo.includes(filters.tipo)){
+                    return true
+                }  
+                else return false
+            })
+            setAccounts(filteredAccounts)
+        }else if(filters.cliente!=="" && filters.empresa!=="" && filters.tipo===""){
+            //buscar por cliente y empresa
+            console.log("se busco por cliente y empresa")
+            const filteredAccounts = accounts.filter(account=>{
+                if (account.cliente.includes(filters.cliente) && account.empresa.includes(filters.empresa)){
+                    return true
+                }  
+                else return false
+            })
+            setAccounts(filteredAccounts)
+        }else if (filters.cliente!=="" && filters.empresa==="" && filters.tipo!==""){
+            //buscar por cliente y tipo
+            console.log("se busco por cliente y tipo")
+            const filteredAccounts = accounts.filter(account=>{
+                if (account.cliente.includes(filters.cliente) && account.tipo.includes(filters.tipo)){
+                    return true
+                }  
+                else return false
+            })
+            setAccounts(filteredAccounts)
+        }else if (filters.cliente==="" && filters.empresa!=="" && filters.tipo!==""){
+            //buscar por empresa y tipo
+            console.log("se busco por empresa y tipo")
+            const filteredAccounts = accounts.filter(account=>{
+                if ( account.empresa.includes(filters.empresa) && account.tipo.includes(filters.tipo)){
+                    return true
+                }  
+                else return false
+            })
+            setAccounts(filteredAccounts)
+        }
+    }
+
+    const cleanFilters=()=>{
+        setAccounts(resetAccount)
     }
 
 
-
     //filtrar y manejar cambios en los filtros
-          const [total,setTotal]=useState(0)
+          
         const HandleChange1=(e)=>{
             e.preventDefault()
             const tableReg = document.getElementById('datos');
@@ -129,8 +191,7 @@ export const ShowAccounts = ()=>{
         
  
         // mostrar las cuentas corrientes y cambiar si esta vencido o no  
-        const [accounts,setAccounts]=useState([])
-        const [loading,setLoading]=useState(true)
+        
         useEffect(()=>{
             getAccounts().then(response=>{
                 const toUpdate=response
@@ -199,23 +260,25 @@ export const ShowAccounts = ()=>{
                     <Nav className="me-auto">
                     <NavDropdown title="Menu" className='select' id="nav-dropdown">
                         <NavDropdown.Item eventKey="4.1" as={Link} to={'/'}>Facturas</NavDropdown.Item>
-                        <NavDropdown.Item eventKey="4.2">Recibos</NavDropdown.Item>                            
+                        <NavDropdown.Item eventKey="4.2"  as={Link} to={'/Recibos'}>Recibos</NavDropdown.Item>                            
                         <NavDropdown.Item eventKey="4.3" as={Link} to={'/clientes'} >Clientes</NavDropdown.Item>
                         <NavDropdown.Item eventKey="4.4" as={Link} to={'/empresas'}>Empresas</NavDropdown.Item>
                     </NavDropdown>
-                    <Form.Select onChange={HandleChange} id='cliente' className='select'  aria-label="Default select example">
+                    <Form.Select onClick={HandleChange} id='cliente' name="cliente" className='select'  aria-label="Default select example">
                         <option value="">Cliente</option>
                         {customers.map(customer=><option key={customer.id} value={customer.name}>{customer.name}</option>)}
                     </Form.Select>
-                    <Form.Select onChange={HandleChange} id='empresa' className='select'  aria-label="Default select example">
+                    <Form.Select onClick={HandleChange} id='empresa' name="empresa" className='select'  aria-label="Default select example">
                     <option value="">Empresa</option>
                         {companies.map(company=><option key={company.id} value={company.name}>{company.name}</option>)}
                     </Form.Select>
-                    <Form.Select onChange={HandleChange} id='tipo' className='select' aria-label="Default select example">
+                    <Form.Select onClick={HandleChange} id='tipo' name="tipo" className='select' aria-label="Default select example">
                         <option value="">Tipo</option>
                         <option value="Factura">Factura</option>
                         <option value="Remito">Remito</option>
                     </Form.Select>
+                    <Button variant="primary"  onClick={handleSubmit} >Buscar</Button>
+                    <Button variant="danger"  onClick={cleanFilters}>Limpiar Filtros</Button>      
                     </Nav>
                     <Form onChange={HandleChange1}  className="d-flex">
                         <Form.Control

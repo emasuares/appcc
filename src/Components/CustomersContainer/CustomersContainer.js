@@ -91,7 +91,7 @@ export const CustomerContainer=()=>{
                             <Nav className="me-auto">
                             <NavDropdown title="Menu" className='select' id="nav-dropdown">
                                     <NavDropdown.Item eventKey="4.1" as={Link} to={'/'}>Facturas</NavDropdown.Item>
-                                    <NavDropdown.Item eventKey="4.2">Recibos</NavDropdown.Item>                            
+                                    <NavDropdown.Item eventKey="4.2" as={Link} to={'/Recibos'}>Recibos</NavDropdown.Item>                            
                                     <NavDropdown.Item eventKey="4.3" as={Link} to={'/clientes'} >Clientes</NavDropdown.Item>
                                     <NavDropdown.Item eventKey="4.4" as={Link} to={'/empresas'}>Empresas</NavDropdown.Item>
                             </NavDropdown>
